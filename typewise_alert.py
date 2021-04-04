@@ -12,6 +12,10 @@ coolingType_limits = {
         'HIGH_ACTIVE_COOLING' : {'lowerLimit' : 0 , 'upperLimit' : 45},
         'MED_ACTIVE_COOLING' : {'lowerLimit' : 0 , 'upperLimit' : 40}}
 
+breachType_email_recepient = {
+        'TOO_LOW': {'recepient': "low.b@c.com"},
+        'TOO_HIGH': {'recepient': "High.b@c.com"}}
+
 
 def classify_temperature_breach(coolingType, temperatureInC):
     if validate_input(coolingType, temperatureInC):       
@@ -24,22 +28,27 @@ def validate_input(coolingType, temperatureInC):
     return (coolingType.upper() in coolingType_limits.keys() and isinstance(temperatureInC, numbers.Number))    
         
     
-def check_and_alert(alertTarget, breachType):
+def check_and_alert(alertTarget, batteryChar, temperatureInC):
+    breachType = classify_temperature_breach(batteryChar['coolingType'], temperatureInC)
     if not breachType == "NORMAL":
-        alertTarget_type[alertTarget](breachType)
+       return(alertTarget_type[alertTarget](breachType))     
 
 
+def send_to_console(breachType):
+  print(f'BreachType is:, {breachType}')
+  return True
+  
 def send_to_controller(breachType):
   header = 0xfeed
   print(f'{header}, {breachType}')
+  return True   
 
-def make_email(recepient):
-    def send_to_email(breachType):
-        print(f'To: {recepient}')
-        print(f'Hello {recepient}, {breachType}')
-    return send_to_email
+def send_to_email(breachType):
+   print(f"Hello: {breachType_email_recepient[breachType]['recepient']}\n Breach is: {breachType}")
+   return True
     
 alertTarget_type = {
-        'email': make_email("a.b@c.com"),
-        'controller' : send_to_controller
+        'email': send_to_email,
+        'controller' : send_to_controller,
+        'console' : send_to_console
         }
