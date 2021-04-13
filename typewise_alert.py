@@ -30,8 +30,15 @@ def validate_input(coolingType, temperatureInC):
     
 def check_and_alert(alertTarget, batteryChar, temperatureInC):
     breachType = classify_temperature_breach(batteryChar['coolingType'], temperatureInC)
-    if not breachType == "NORMAL":
-       return(alertTarget_type[alertTarget](breachType))     
+    if not breachType == "NORMAL" and validate_alertTarget(alertTarget, breachType):
+       return(alertTarget_type[alertTarget](breachType))
+    else:
+        return 'Improper Input'
+       
+def validate_alertTarget(alertTarget, breachType):
+  if alertTarget in alertTarget_type.keys() and breachType != 'Improper Input':
+    return True
+  return False
 
 
 def send_to_console(breachType):
